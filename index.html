@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para ti con cariño</title>
     <style>
-        /* --- ESTILOS GENERALES --- */
         body {
             font-family: 'Georgia', serif;
             background-color: #f7f1e3;
@@ -48,7 +47,6 @@
             font-size: 1.1em;
         }
 
-        /* --- CONTENEDOR DE CARTAS --- */
         .cartas-container {
             display: flex;
             flex-direction: column;
@@ -64,17 +62,16 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
-            border-left: 6px solid #bdc3c7; /* Gris = Bloqueado */
+            border-left: 6px solid #bdc3c7;
             position: relative;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            opacity: 0.8; /* Un poco transparente si está bloqueada */
+            opacity: 0.8;
         }
 
-        /* Estado desbloqueado */
         .carta.desbloqueada {
-            border-left-color: #e74c3c; /* Rojo = Abierto */
+            border-left-color: #e74c3c;
             opacity: 1;
             cursor: pointer;
         }
@@ -93,11 +90,10 @@
             margin-bottom: 5px;
         }
 
-        /* --- TEMPORIZADOR --- */
         .status-text {
             font-size: 0.9em;
             color: #7f8c8d;
-            font-family: 'Courier New', monospace; /* Fuente tipo reloj */
+            font-family: 'Courier New', monospace;
             font-weight: bold;
         }
 
@@ -106,7 +102,6 @@
             margin-left: 15px;
         }
 
-        /* --- MODAL (LECTURA) --- */
         #modal {
             display: none;
             position: fixed;
@@ -129,166 +124,3 @@
             overflow-y: auto;
             position: relative;
             line-height: 1.8;
-            font-size: 1.1em;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-        }
-
-        .cerrar {
-            position: absolute;
-            top: 10px; right: 15px;
-            font-size: 28px;
-            cursor: pointer;
-            color: #95a5a6;
-        }
-        
-        #modal-cuerpo { white-space: pre-line; }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="titulo-box">
-            <h1>Para ti con cariño</h1>
-        </div>
-        <p class="subtitle">Una sorpresa cada 12 horas...</p>
-    </header>
-
-    <div id="lista-cartas" class="cartas-container">
-        </div>
-
-    <div id="modal">
-        <div class="modal-content">
-            <span class="cerrar" onclick="cerrarCarta()">&times;</span>
-            <h2 id="modal-titulo" style="color: #e74c3c; margin-top:0;"></h2>
-            <div id="modal-cuerpo"></div>
-            <p style="margin-top: 30px; text-align: right; font-weight: bold;">- Javier</p>
-        </div>
-    </div>
-
-    <script>
-        // ==========================================
-        //          CONFIGURACIÓN
-        // ==========================================
-        
-        // 1. FECHA DE INICIO DE LA PRIMERA CARTA
-        // Formato: AAAA-MM-DD Hora:Minutos:Segundos (Hora militar)
-        const fechaInicioString = "2026-02-14 08:00:00"; 
-
-        // 2. TUS 14 MENSAJES
-        const mensajes = [
-            { titulo: "Carta 1: El comienzo", texto: "Hola, aquí empieza todo. He preparado esto con mucho cariño..." },
-            { titulo: "Carta 2: Pensando en ti", texto: "Ya pasaron 12 horas. Espero que tu día vaya genial..." },
-            { titulo: "Carta 3: Un recuerdo", texto: "Me acordé de aquella vez que..." },
-            { titulo: "Carta 4: Tu sonrisa", texto: "Solo quería decirte que me encanta cuando sonríes." },
-            { titulo: "Carta 5", texto: "Texto de la carta 5..." },
-            { titulo: "Carta 6", texto: "Texto de la carta 6..." },
-            { titulo: "Carta 7", texto: "Texto de la carta 7..." },
-            { titulo: "Carta 8", texto: "Texto de la carta 8..." },
-            { titulo: "Carta 9", texto: "Texto de la carta 9..." },
-            { titulo: "Carta 10", texto: "Texto de la carta 10..." },
-            { titulo: "Carta 11", texto: "Texto de la carta 11..." },
-            { titulo: "Carta 12", texto: "Texto de la carta 12..." },
-            { titulo: "Carta 13", texto: "Casi terminamos..." },
-            { titulo: "Carta 14: La última", texto: "Gracias por leerlas todas. Te quiero." }
-        ];
-
-        // ==========================================
-        //      MOTOR DEL TEMPORIZADOR (NO TOCAR)
-        // ==========================================
-        const container = document.getElementById('lista-cartas');
-        const fechaInicio = new Date(fechaInicioString);
-        const intervaloMs = 12 * 60 * 60 * 1000; // 12 horas
-
-        // Generamos las tarjetas HTML vacías primero
-        mensajes.forEach((msj, index) => {
-            const div = document.createElement('div');
-            div.className = 'carta'; // Empiezan todas como bloqueadas visualmente
-            div.id = carta-${index};
-            
-            div.innerHTML = `
-                <div class="info-carta">
-                    <div class="titulo-carta">${msj.titulo}</div>
-                    <div class="status-text" id="timer-${index}">Calculando...</div>
-                </div>
-                <div class="icono-estado" id="icon-${index}">🔒</div>
-            `;
-            
-            // Evento de clic (se valida si está abierta dentro de la función)
-            div.onclick = () => intentarAbrir(index);
-            container.appendChild(div);
-        });
-
-        // Función que actualiza los contadores cada segundo
-        function actualizarRelojes() {
-            const hoy = new Date();
-
-            mensajes.forEach((msj, index) => {
-                const fechaDesbloqueo = new Date(fechaInicio.getTime() + (index * intervaloMs));
-                const diferencia = fechaDesbloqueo - hoy;
-                
-                const timerElement = document.getElementById(timer-${index});
-                const iconElement = document.getElementById(icon-${index});
-                const cartaElement = document.getElementById(carta-${index});
-
-                if (diferencia <= 0) {
-                    // YA ESTÁ DESBLOQUEADA
-                    if (!cartaElement.classList.contains('desbloqueada')) {
-                        cartaElement.classList.add('desbloqueada');
-                        timerElement.innerText = "¡Haz clic para leer!";
-                        timerElement.style.color = "#27ae60"; // Verde
-                        iconElement.innerText = "💌";
-                    }
-                } else {
-                    // AÚN BLOQUEADA (Cuenta regresiva)
-                    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-                    const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
-                    const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
-
-                    let texto = "Disponible en: ";
-                    if (dias > 0) texto += `${dias}d `;
-                    texto += ${ceros(horas)}:${ceros(minutos)}:${ceros(segundos)};
-                    
-                    timerElement.innerText = texto;
-                }
-            });
-        }
-
-        // Agrega un cero delante si el número es menor a 10 (ej: 09:05)
-        function ceros(n) {
-            return n < 10 ? '0' + n : n;
-        }
-
-        function intentarAbrir(index) {
-            const cartaElement = document.getElementById(carta-${index});
-            if (cartaElement.classList.contains('desbloqueada')) {
-                abrirModal(mensajes[index].titulo, mensajes[index].texto);
-            } else {
-                // Pequeña animación de "vibración" si intenta abrirla antes de tiempo
-                cartaElement.style.transform = "translateX(5px)";
-                setTimeout(() => cartaElement.style.transform = "translateX(0)", 100);
-            }
-        }
-
-        function abrirModal(titulo, texto) {
-            document.getElementById('modal-titulo').innerText = titulo;
-            document.getElementById('modal-cuerpo').innerText = texto;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        function cerrarCarta() {
-            document.getElementById('modal').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('modal')) {
-                cerrarCarta();
-            }
-        }
-
-        // Iniciar el reloj y actualizarlo cada 1 segundo (1000ms)
-        setInterval(actualizarRelojes, 1000);
-        actualizarRelojes(); // Ejecutar una vez al inicio para que no tarde 1 seg en aparecer
-    </script>
-</body>
-</html>
